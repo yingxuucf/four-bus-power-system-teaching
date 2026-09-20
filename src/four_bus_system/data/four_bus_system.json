@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "title": "电力系统分析四母线贯穿案例",
+    "version": "1.0",
+    "source": "贯穿案例_四母线系统完整参数体系.xlsx",
+    "scope": "teaching-only"
+  },
+  "base": {
+    "s_mva": 100.0,
+    "frequency_hz": 50.0,
+    "voltage_kv": {"B1": 10.5, "B2": 220.0, "B3": 220.0, "B4": 10.5}
+  },
+  "buses": [
+    {"id": "B1", "name": "发电机端", "normal_type": "Slack", "v_set_pu": 1.04},
+    {"id": "B2", "name": "送端220kV", "normal_type": "PQ", "v_set_pu": null},
+    {"id": "B3", "name": "受端220kV", "normal_type": "PV", "v_set_pu": 1.02},
+    {"id": "B4", "name": "负荷母线", "normal_type": "PQ", "v_set_pu": null}
+  ],
+  "branches": [
+    {"id": "T1", "kind": "transformer", "from": "B1", "to": "B2", "rating_mva": 100.0, "r1": 0.005, "x1": 0.10, "r2": 0.005, "x2": 0.10, "r0": 0.005, "x0": 0.10, "b1": 0.0, "connection": "YNd11"},
+    {"id": "L1", "kind": "line", "from": "B2", "to": "B3", "rating_mva": 100.0, "length_km": 150.0, "r1": 0.015, "x1": 0.12, "r2": 0.015, "x2": 0.12, "r0": 0.045, "x0": 0.36, "b1": 0.03},
+    {"id": "L2", "kind": "line", "from": "B2", "to": "B3", "rating_mva": 100.0, "length_km": 150.0, "r1": 0.015, "x1": 0.12, "r2": 0.015, "x2": 0.12, "r0": 0.045, "x0": 0.36, "b1": 0.03},
+    {"id": "T2", "kind": "transformer", "from": "B3", "to": "B4", "rating_mva": 100.0, "r1": 0.005, "x1": 0.12, "r2": 0.005, "x2": 0.12, "r0": 0.010, "x0": 0.12, "b1": 0.0, "connection": "YNyn0"}
+  ],
+  "generators": {
+    "G1": {
+      "bus": "B1", "rating_mva": 100.0,
+      "r1": 0.002, "xd": 1.8, "xq": 1.7, "xdp": 0.30, "xqp": 0.55,
+      "xdpp": 0.20, "xqpp": 0.20, "x2": 0.22, "x0": 0.08,
+      "tdop_s": 6.0, "tdopp_s": 0.04, "tqopp_s": 0.07,
+      "h_s": 4.5, "d_pu": 0.0, "eprime_pu": 1.10,
+      "p_min_mw": 0.0, "p_max_mw": 90.0, "q_min_mvar": -40.0, "q_max_mvar": 60.0,
+      "ground_x_pu": 0.05
+    },
+    "G2eq": {
+      "bus": "B3", "rating_mva": 150.0, "p_mw": 20.0, "v_pu": 1.02,
+      "x1": 0.15, "x2": 0.18, "x0": 0.25,
+      "q_min_mvar": -50.0, "q_max_mvar": 80.0
+    }
+  },
+  "loads": {
+    "normal": {"bus": "B4", "p_mw": 60.0, "q_mvar": 25.0},
+    "heavy": {"bus": "B4", "p_mw": 85.0, "q_mvar": 40.0},
+    "frequency_d": 1.5
+  },
+  "frequency_control": {
+    "g1_r": 0.05, "g1_rated_mw": 100.0,
+    "g2_r": 0.04, "g2_rated_mw": 150.0,
+    "load_step_mw": 10.0
+  },
+  "stability": {
+    "pm_pu": 0.75, "eprime_pu": 1.10, "infinite_bus_voltage_pu": 1.02,
+    "x_pre_pu": 0.61, "x_post_pu": 0.67, "pmax_fault_pu": 0.0,
+    "example_clearing_times_s": [0.20, 0.32]
+  },
+  "scenarios": {
+    "N0": {"description": "单电源、正常负荷、双回线", "load": "normal", "line_count": 2, "g2_mode": "off"},
+    "N1": {"description": "单电源、正常负荷、单回线", "load": "normal", "line_count": 1, "g2_mode": "off"},
+    "H1": {"description": "单电源、重载、双回线", "load": "heavy", "line_count": 2, "g2_mode": "off"},
+    "PF1": {"description": "多电源、正常负荷、双回线", "load": "normal", "line_count": 2, "g2_mode": "pv"},
+    "F1": {"description": "负荷阶跃增加10 MW", "load": "normal", "line_count": 2, "g2_mode": "finite"},
+    "SC1": {"description": "B2三相金属性短路", "fault_bus": "B2", "fault_impedance_pu": 0.0},
+    "UF1": {"description": "B4单相接地金属性短路", "fault_bus": "B4", "fault_impedance_pu": 0.0},
+    "ST1": {"description": "L1送端三相故障，切除L1", "line_count_pre": 2, "line_count_post": 1}
+  },
+  "reference_power_flow": {
+    "N0": {"vm": [1.04, 1.00817756, 0.98614017, 0.94852434], "loss_mw": 0.791249},
+    "N1": {"vm": [1.04, 1.00108779, 0.95154878, 0.91220664], "loss_mw": 1.245853},
+    "H1": {"vm": [1.04, 0.97509765, 0.93381014, 0.86633722], "loss_mw": 2.001004},
+    "PF1": {"vm": [1.04, 1.02933119, 1.02, 0.98392309], "loss_mw": 0.422606}
+  },
+  "reference_faults": {
+    "B2_three_phase_z1_pu": [0.00346, 0.12424],
+    "B4_slg_z1_pu": [0.006253312153478396, 0.2259179863259322],
+    "B4_slg_z2_pu": [0.006497083030270681, 0.2421816208998910],
+    "B4_slg_z0_pu": [0.01610229668256962, 0.2523921002995673]
+  }
+}
